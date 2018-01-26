@@ -24,12 +24,12 @@ func TestDefaultHTTPError(t *testing.T) {
 	}{
 		{
 			err:    fmt.Errorf("example error"),
-			status: http.StatusInternalServerError,
+			status: http.StatusOK,
 			msg:    "example error",
 		},
 		{
 			err:    status.Error(codes.NotFound, "no such resource"),
-			status: http.StatusNotFound,
+			status: http.StatusOK,
 			msg:    "no such resource",
 		},
 	} {
@@ -50,7 +50,9 @@ func TestDefaultHTTPError(t *testing.T) {
 			continue
 		}
 
-		if got, want := body["error"].(string), spec.msg; !strings.Contains(got, want) {
+		errMap, want := body["error"].(map[string]interface{}), spec.msg
+		got := errMap["message"].(string)
+		if !strings.Contains(got, want) {
 			t.Errorf(`body["error"] = %q; want %q; on spec.err=%v`, got, want, spec.err)
 		}
 	}
